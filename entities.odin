@@ -2,41 +2,43 @@
 
 package kuberpync
 
-stat :: enum {
-    INT,
-    REF,
-    TECH,
-    COOL,
-    ATTR,
-    LUCK,
-    MOVE,
-    BODY,
-    EMP,
+import "core:fmt"
+
+Stat :: enum {
+	INT,
+	REF,
+	TECH,
+	COOL,
+	ATTR,
+	LUCK,
+	MOVE,
+	BODY,
+	EMP,
 }
 
-roles :: enum {
-    SOLO,
-    ROCKER,
-    NETRUNNER,
-    MEDIA,
-    NOMAD,
-    FIXER,
-    COP,
-    CORP,
-    TECHIE,
-    MEDTECH,
+Roles :: enum {
+	SOLO,
+	ROCKER,
+	NETRUNNER,
+	MEDIA,
+	NOMAD,
+	FIXER,
+	COP,
+	CORP,
+	TECHIE,
+	MEDTECH,
 }
 
 bodyPart :: enum {
-    HEAD,
-    TORSO,
-    R_ARM,
-    L_ARM,
-    R_LEG,
-    L_LEG,
+	HEAD,
+	TORSO,
+	R_ARM,
+	L_ARM,
+	R_LEG,
+	L_LEG,
 }
 
-skillMap := map[string]stat {
+skillMap := map[string]Stat {
     // ATTR
     "Personal Grooming" = .ATTR,
     "Wardrobe & Style" = .ATTR,
@@ -128,7 +130,7 @@ skillMap := map[string]stat {
     "Weaponsmith" = .TECH,
 }
 
-skillList := [?]string{
+Skill_List := [?]string{
     // ATTR
     "Personal Grooming",
     "Wardrobe & Style",
@@ -136,13 +138,13 @@ skillList := [?]string{
     "Endurance",
     "Strength feat",
     "Swimming",
-    "COOL/WILL",
+    // COOL/WILL
     "Interrogation",
     "Intimidate",
     "Oratory",
     "Resist Torture/Drugs",
     "Streetwise",
-    "EMPATHY",
+    // EMPATHY
     "Human Perception",
     "Interview",
     "Leadership",
@@ -221,11 +223,45 @@ skillList := [?]string{
 }
 
 character :: struct {
-    name: string,
-    role: [roles]int,
-    stats: [stat]int,
-    bodyloc: [bodyPart]int,
-    skills: map[string]int,
+	name: string,
+	role: [Roles]int,
+	stats: [Stat]int,
+	bodyloc: [bodyPart]int,
+	skills: map[string]int,
 }
 
-// character sheet, set name and details as fields. Stats and skills string -> int maps (i8). Equipment struct for body parts and loadout slots.
+role :: struct {
+	name: string,
+	level: int,
+}
+
+pretty_print_character :: proc(c: ^character) {
+	fmt.printfln("Name:    %v", c.name)
+	leveled_roles: [dynamic]role
+	for lvl, i in c.role {
+		if c.role[i] > 0 {
+			role_name, _ := fmt.enum_value_to_string(i)
+			append(&leveled_roles, role{role_name, lvl})
+		}
+	}
+	fmt.printfln("Role:")
+	for r in leveled_roles {
+		fmt.printfln("  %v @ level %v", r.name, r.level)
+	}
+	pretty_print_stats(c)
+}
+
+pretty_print_stats :: proc(c: ^character) {
+    fmt.printfln("Stats:")
+    fmt.printfln("  INT:   %v", c.stats[.INT])
+    fmt.printfln("  REF:   %v", c.stats[.REF])
+    fmt.printfln("  TECH:  %v", c.stats[.TECH])
+    fmt.printfln("  COOL:  %v", c.stats[.COOL])
+    fmt.printfln("  ATTR:  %v", c.stats[.ATTR])
+    fmt.printfln("  LUCK:  %v", c.stats[.LUCK])
+    fmt.printfln("  MOVE:  %v", c.stats[.MOVE])
+    fmt.printfln("  BODY:  %v", c.stats[.BODY])
+    fmt.printfln("  EMP:   %v", c.stats[.EMP])
+}
+
+	// character sheet, set name and details as fields. Stats and skills string -> int maps (i8).Equipment struct for body parts and loadout slots.
